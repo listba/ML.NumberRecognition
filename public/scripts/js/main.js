@@ -1,5 +1,5 @@
 (function() {
-  var addClick, apiKey, bindEvents, clicks, convertToGrayscale, ctx, getPixel, init, mouseX, mouseY, paint, redraw, s, scaleImage, sendPostData, unit, wsUrl;
+  var addClick, bindEvents, clicks, convertToGrayscale, ctx, getPixel, init, mouseX, mouseY, paint, redraw, s, scaleImage, sendPostData, unit;
 
   unit = 1;
 
@@ -14,10 +14,6 @@
   clicks = new Array();
 
   ctx = {};
-
-  wsUrl = "https://ussouthcentral.services.azureml.net/workspaces/a85ddf947a0d405a88479716d397e9d6/services/715562c4fd3047198f6460ec5f6aae09/execute?api-version=2.0&details=true";
-
-  apiKey = "mhsFax1F6uyU/9384crjqbBIjFiS80Qrhel8egogSWwV2DyTV1LsAvWtlRr/zCOM7+JQENrStml8o/k9+N+bCQ==";
 
   init = function() {
     var canvas, scaleBtn;
@@ -43,8 +39,9 @@
         }
         return results;
       })();
-      sendPostData();
-      debugger;
+      requestDataBase.Inputs.Number.Values = [_.flatten(pixelMap)];
+      requestData.Inputs.Number.Values = [].push(_.flatten(pixelMap));
+      return sendPostData(requestDataBase);
     });
   };
 
@@ -86,9 +83,9 @@
 
   redraw = function() {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.strokeStyle = '#df4b26';
+    ctx.strokeStyle = '#000000';
     ctx.lineJoin = 'round';
-    ctx.lineWidth = 5;
+    ctx.lineWidth = 9;
     _.forEach(clicks, function(v, k) {
       ctx.beginPath();
       if (v.drag && k) {
@@ -108,11 +105,11 @@
     scale = document.getElementById('ScaleCanvas');
     scaleCtx = scale.getContext("2d");
     tempCanvas = document.createElement('canvas');
-    tempCanvas.width = 100;
-    tempCanvas.height = 100;
-    imageData = ctx.getImageData(0, 0, 100, 100);
+    tempCanvas.width = 200;
+    tempCanvas.height = 200;
+    imageData = ctx.getImageData(0, 0, 200, 200);
     tempCanvas.getContext('2d').putImageData(imageData, 0, 0);
-    scaleCtx.scale(.2, .2);
+    scaleCtx.scale(.1, .1);
     scaleCtx.drawImage(tempCanvas, 0, 0);
     return scaleCtx.getImageData(0, 0, 20, 20);
   };
@@ -131,21 +128,25 @@
   };
 
   convertToGrayscale = function(pixel) {
-    return (0.2125 * pixel.r) + (0.7154 * pixel.g) + (0.0721 * pixel.b);
+    return pixel.a / 255;
   };
 
-  sendPostData = function() {
-    debugger;
+  sendPostData = function(req) {
     var xhttp;
     xhttp = new XMLHttpRequest();
     xhttp.open("POST", '/img', true);
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.onreadystatechange = function() {
+      var data, pd;
       if (xhttp.readyState === 4 && xhttp.status === 200) {
-        return console.log(xhttp.responseText);
+        data = JSON.parse(xhttp.responseText);
+        if (data.statusCode === 200) {
+          pd = data.body.Results.Number.value.Values[0].slice(400);
+          return console.log(pd);
+        }
       }
     };
-    return xhttp.send(requestData);
+    return xhttp.send(JSON.stringify(req));
   };
 
   window.addEventListener('load', init, false);
