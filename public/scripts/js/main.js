@@ -1,15 +1,9 @@
 (function() {
-  var addClick, bindEvents, clicks, convertToGrayscale, ctx, getPixel, init, mouseX, mouseY, paint, redraw, s, scaleImage, sendPostData, unit;
+  var addClick, bindEvents, clicks, convertToGrayscale, ctx, getPixel, init, paint, redraw, scaleImage, sendPostData, unit;
 
   unit = 1;
 
-  s = {};
-
   paint = false;
-
-  mouseX = {};
-
-  mouseY = {};
 
   clicks = new Array();
 
@@ -22,8 +16,9 @@
     bindEvents(canvas);
     scaleBtn = document.getElementById('scale');
     return scaleBtn.addEventListener('click', function(e) {
-      var imgData, pixelMap, x, y;
-      imgData = scaleImage(canvas, ctx);
+      var imgData, pixelMap, scaleCanvas, x, y;
+      scaleCanvas = scaleImage(canvas, ctx);
+      imgData = scaleCanvas.getContext('2d').getImageData(0, 0, 20, 20);
       pixelMap = (function() {
         var j, ref, results;
         results = [];
@@ -40,15 +35,12 @@
         return results;
       })();
       requestDataBase.Inputs.Number.Values = [_.flatten(pixelMap)];
-      requestData.Inputs.Number.Values = [].push(_.flatten(pixelMap));
-      return sendPostData(requestDataBase);
+      return sendPostData(requestDataBase, scaleCanvas);
     });
   };
 
   bindEvents = function(canvas) {
     canvas.addEventListener('mousedown', function(e) {
-      mouseX = e.pageX - this.offsetLeft;
-      mouseY = e.pageY - this.offsetTop;
       paint = true;
       addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, false);
       redraw();
@@ -100,18 +92,17 @@
     return unit;
   };
 
-  scaleImage = function() {
-    var imageData, scale, scaleCtx, tempCanvas;
-    scale = document.getElementById('ScaleCanvas');
-    scaleCtx = scale.getContext("2d");
-    tempCanvas = document.createElement('canvas');
-    tempCanvas.width = 200;
-    tempCanvas.height = 200;
-    imageData = ctx.getImageData(0, 0, 200, 200);
-    tempCanvas.getContext('2d').putImageData(imageData, 0, 0);
+  scaleImage = function(canvas) {
+    var scaleCanvas, scaleCtx;
+    scaleCanvas = document.createElement('canvas');
+    scaleCtx = scaleCanvas.getContext("2d");
+    scaleCanvas.width = 20;
+    scaleCanvas.height = 20;
     scaleCtx.scale(.1, .1);
-    scaleCtx.drawImage(tempCanvas, 0, 0);
-    return scaleCtx.getImageData(0, 0, 20, 20);
+    scaleCtx.drawImage(canvas, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    clicks = new Array();
+    return scaleCanvas;
   };
 
   getPixel = function(imgData, x, y) {
@@ -131,18 +122,24 @@
     return pixel.a / 255;
   };
 
-  sendPostData = function(req) {
+  sendPostData = function(req, img) {
     var xhttp;
     xhttp = new XMLHttpRequest();
     xhttp.open("POST", '/img', true);
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.onreadystatechange = function() {
-      var data, pd;
+      var container, data, parent, pd, prediction;
       if (xhttp.readyState === 4 && xhttp.status === 200) {
         data = JSON.parse(xhttp.responseText);
         if (data.statusCode === 200) {
           pd = data.body.Results.Number.value.Values[0].slice(400);
-          return console.log(pd);
+          container = document.getElementById('results');
+          parent = document.createElement('div');
+          prediction = document.createElement('label');
+          prediction.innerHTML = pd[10];
+          parent.appendChild(prediction);
+          parent.appendChild(img);
+          return container.appendChild(parent);
         }
       }
     };

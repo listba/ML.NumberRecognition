@@ -1,10 +1,7 @@
 unit = 1
 
 # Variables
-s = {}
 paint = false
-mouseX = {}
-mouseY = {}
 clicks = new Array()
 ctx = {}
 
@@ -16,22 +13,20 @@ init = () ->
 
 	scaleBtn = document.getElementById 'scale'
 	scaleBtn.addEventListener('click', (e) ->
-		imgData = scaleImage(canvas,ctx);
+		scaleCanvas = scaleImage(canvas,ctx);
+		imgData = scaleCanvas.getContext('2d').getImageData(0, 0, 20, 20)
 		pixelMap = 
 			for x in [0..imgData.width-1]
 				for y in [0..imgData.height-1]
 					convertToGrayscale(getPixel(imgData, x, y))
 
 		requestDataBase.Inputs.Number.Values = [_.flatten pixelMap]
-		requestData.Inputs.Number.Values = [].push _.flatten pixelMap
-		sendPostData requestDataBase
+		sendPostData requestDataBase, scaleCanvas
 	);
 
 # Private Functions
 bindEvents = (canvas) ->
 	canvas.addEventListener('mousedown', (e) ->
-		mouseX = e.pageX - this.offsetLeft
-		mouseY = e.pageY - this.offsetTop
 		paint = true
 		addClick e.pageX - this.offsetLeft, e.pageY - this.offsetTop, false
 		redraw()
@@ -79,17 +74,24 @@ redraw = () ->
 		ctx.stroke()
 	unit
 
-scaleImage = () ->
-	scale = document.getElementById 'ScaleCanvas'
-	scaleCtx = scale.getContext("2d");
-	tempCanvas = document.createElement('canvas')
-	tempCanvas.width = 200
-	tempCanvas.height = 200
-	imageData = ctx.getImageData(0, 0, 200, 200);
-	tempCanvas.getContext('2d').putImageData(imageData,0,0)
+scaleImage = (canvas) ->
+	#Create new canvas
+	scaleCanvas = document.createElement('canvas')
+	scaleCtx = scaleCanvas.getContext("2d");
+
+	#Set Size
+	scaleCanvas.width = 20
+	scaleCanvas.height = 20
+
+	#Scale Image
 	scaleCtx.scale(.1,.1);
-	scaleCtx.drawImage(tempCanvas,0,0)
-	scaleCtx.getImageData(0, 0, 20, 20);
+	scaleCtx.drawImage(canvas,0,0)
+
+	#clear drawing area
+	ctx.clearRect(0, 0, canvas.width, canvas.height)
+	clicks = new Array()
+	#return scaled down image
+	scaleCanvas
 
 getPixel = (imgData,x,y)  ->
 	index = y*imgData.width+x
@@ -105,7 +107,7 @@ convertToGrayscale = (pixel) ->
 	pixel.a/255
 	#(((0.2125*pixel.r) + (0.7154 * pixel.g) + (0.0721 * pixel.b))/255).toString()
 	
-sendPostData = (req) ->
+sendPostData = (req, img) ->
 	xhttp = new XMLHttpRequest()
 	xhttp.open "POST", '/img', true
 	xhttp.setRequestHeader 'Content-Type', 'application/json'
@@ -114,7 +116,14 @@ sendPostData = (req) ->
 			data = JSON.parse xhttp.responseText
 			if data.statusCode is 200
 				pd = data.body.Results.Number.value.Values[0].slice(400)
-				console.log pd
+				container = document.getElementById 'results'
+				parent = document.createElement('div')
+				prediction = document.createElement('label')
+				prediction.innerHTML = pd[10]
+				parent.appendChild prediction
+				parent.appendChild img
+				container.appendChild parent
+
 	xhttp.send JSON.stringify req
 
 
