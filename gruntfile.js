@@ -10,7 +10,7 @@ module.exports = function(grunt) {
           compress: true,  //minifying the result
         },
         files: {
-          "./content/css/main.css":"./content/less/main.less"
+          "./public/content/css/main.css":"./public/content/less/main.less"
         }
       }
     },
@@ -18,20 +18,21 @@ module.exports = function(grunt) {
       compile: {
         files: {
           //'./scripts/coffee/to/result.js': 'path/to/source.coffee', // 1:1 compile 
-          './scripts/js/main.js': ['./scripts/coffee/*.coffee'] // compile and concat into single file 
+          './public/scripts/js/main.js': ['./public/scripts/coffee/*.coffee'], 
+          './app.js': ['./app.coffee']
         }
   }
     },
     watch: {
         less: {
-          files: ['./content/less/*.less'],
+          files: ['./public/content/less/*.less'],
           tasks: ['less'],
           options: {
             livereload: true
           }
         },
         coffee: {
-          files: ['./scripts/coffee/*.coffee'],  
+          files: ['./public/scripts/coffee/*.coffee','./app.coffee'],  
           tasks: ['coffee'],
           options: {
             livereload: true
