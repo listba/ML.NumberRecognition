@@ -120,7 +120,7 @@ convertToGrayscale = (pixel) ->
 	#(((0.2125*pixel.r) + (0.7154 * pixel.g) + (0.0721 * pixel.b))/255).toString()
 	
 sendPostData = (req, img) ->
-	###
+	
 	xhttp = new XMLHttpRequest()
 	xhttp.open "POST", '/img', true
 	xhttp.setRequestHeader 'Content-Type', 'application/json'
@@ -128,21 +128,23 @@ sendPostData = (req, img) ->
 		if xhttp.readyState == 4 && xhttp.status == 200
 			data = JSON.parse xhttp.responseText
 			if data.statusCode is 200
-				pd = data.body.Results.Number.value.Values[0].slice(400)
+				pd = data.body.Results.Number.value.Values[0].slice(900)
 				container = document.getElementById 'results'
 				parent = document.createElement('div')
 				prediction = document.createElement('label')
-				prediction.innerHTML = pd[10]
+				prediction.innerHTML = pd[3]
 				parent.appendChild prediction
 				parent.appendChild img
 				container.appendChild parent
+	
+	xhttp.send JSON.stringify req
 	###
 	container = document.getElementById 'results'
 	parent = document.createElement('div')
 	parent.appendChild img
 	container.appendChild parent
-
-	xhttp.send JSON.stringify req
+	###
+	
 
 sendTrainingData = (req) ->
 	#req.data = _.map [0..900], (v) -> v.toString()

@@ -145,30 +145,34 @@
   };
 
   sendPostData = function(req, img) {
+    var xhttp;
+    xhttp = new XMLHttpRequest();
+    xhttp.open("POST", '/img', true);
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.onreadystatechange = function() {
+      var container, data, parent, pd, prediction;
+      if (xhttp.readyState === 4 && xhttp.status === 200) {
+        data = JSON.parse(xhttp.responseText);
+        if (data.statusCode === 200) {
+          pd = data.body.Results.Number.value.Values[0].slice(900);
+          container = document.getElementById('results');
+          parent = document.createElement('div');
+          prediction = document.createElement('label');
+          prediction.innerHTML = pd[3];
+          parent.appendChild(prediction);
+          parent.appendChild(img);
+          return container.appendChild(parent);
+        }
+      }
+    };
+    return xhttp.send(JSON.stringify(req));
 
     /*
-    	xhttp = new XMLHttpRequest()
-    	xhttp.open "POST", '/img', true
-    	xhttp.setRequestHeader 'Content-Type', 'application/json'
-    	xhttp.onreadystatechange = () ->
-    		if xhttp.readyState == 4 && xhttp.status == 200
-    			data = JSON.parse xhttp.responseText
-    			if data.statusCode is 200
-    				pd = data.body.Results.Number.value.Values[0].slice(400)
-    				container = document.getElementById 'results'
-    				parent = document.createElement('div')
-    				prediction = document.createElement('label')
-    				prediction.innerHTML = pd[10]
-    				parent.appendChild prediction
-    				parent.appendChild img
-    				container.appendChild parent
+    	container = document.getElementById 'results'
+    	parent = document.createElement('div')
+    	parent.appendChild img
+    	container.appendChild parent
      */
-    var container, parent;
-    container = document.getElementById('results');
-    parent = document.createElement('div');
-    parent.appendChild(img);
-    container.appendChild(parent);
-    return xhttp.send(JSON.stringify(req));
   };
 
   sendTrainingData = function(req) {
