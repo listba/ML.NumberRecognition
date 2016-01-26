@@ -158,7 +158,7 @@
           container = document.getElementById('results');
           parent = document.createElement('div');
           prediction = document.createElement('label');
-          prediction.innerHTML = pd[pd.length];
+          prediction.innerHTML = pd[pd.length - 1];
           parent.appendChild(prediction);
           parent.appendChild(img);
           return container.appendChild(parent);
