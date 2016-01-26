@@ -24,7 +24,7 @@
       ddlAction = document.getElementById('action');
       action = ddlAction.options[ddlAction.selectedIndex].value;
       scaleCanvas = scaleImage(canvas, ctx);
-      imgData = scaleCanvas.getContext('2d').getImageData(0, 0, 20, 20);
+      imgData = scaleCanvas.getContext('2d').getImageData(0, 0, 30, 30);
       pixelMap = (function() {
         var j, ref, results;
         results = [];
@@ -100,7 +100,7 @@
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.strokeStyle = '#000000';
     ctx.lineJoin = 'round';
-    ctx.lineWidth = 15;
+    ctx.lineWidth = 12;
     _.forEach(clicks, function(v, k) {
       ctx.beginPath();
       if (v.drag && k) {
@@ -119,9 +119,9 @@
     var scaleCanvas, scaleCtx;
     scaleCanvas = document.createElement('canvas');
     scaleCtx = scaleCanvas.getContext("2d");
-    scaleCanvas.width = 20;
-    scaleCanvas.height = 20;
-    scaleCtx.scale(.1, .1);
+    scaleCanvas.width = 30;
+    scaleCanvas.height = 30;
+    scaleCtx.scale(.2, .2);
     scaleCtx.drawImage(canvas, 0, 0);
     clear(canvas);
     return scaleCanvas;
@@ -145,26 +145,29 @@
   };
 
   sendPostData = function(req, img) {
-    var xhttp;
-    xhttp = new XMLHttpRequest();
-    xhttp.open("POST", '/img', true);
-    xhttp.setRequestHeader('Content-Type', 'application/json');
-    xhttp.onreadystatechange = function() {
-      var container, data, parent, pd, prediction;
-      if (xhttp.readyState === 4 && xhttp.status === 200) {
-        data = JSON.parse(xhttp.responseText);
-        if (data.statusCode === 200) {
-          pd = data.body.Results.Number.value.Values[0].slice(400);
-          container = document.getElementById('results');
-          parent = document.createElement('div');
-          prediction = document.createElement('label');
-          prediction.innerHTML = pd[10];
-          parent.appendChild(prediction);
-          parent.appendChild(img);
-          return container.appendChild(parent);
-        }
-      }
-    };
+
+    /*
+    	xhttp = new XMLHttpRequest()
+    	xhttp.open "POST", '/img', true
+    	xhttp.setRequestHeader 'Content-Type', 'application/json'
+    	xhttp.onreadystatechange = () ->
+    		if xhttp.readyState == 4 && xhttp.status == 200
+    			data = JSON.parse xhttp.responseText
+    			if data.statusCode is 200
+    				pd = data.body.Results.Number.value.Values[0].slice(400)
+    				container = document.getElementById 'results'
+    				parent = document.createElement('div')
+    				prediction = document.createElement('label')
+    				prediction.innerHTML = pd[10]
+    				parent.appendChild prediction
+    				parent.appendChild img
+    				container.appendChild parent
+     */
+    var container, parent;
+    container = document.getElementById('results');
+    parent = document.createElement('div');
+    parent.appendChild(img);
+    container.appendChild(parent);
     return xhttp.send(JSON.stringify(req));
   };
 

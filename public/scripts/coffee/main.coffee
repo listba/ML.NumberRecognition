@@ -17,7 +17,7 @@ init = () ->
 		action = ddlAction.options[ddlAction.selectedIndex].value
 
 		scaleCanvas = scaleImage(canvas,ctx);
-		imgData = scaleCanvas.getContext('2d').getImageData(0, 0, 20, 20)
+		imgData = scaleCanvas.getContext('2d').getImageData(0, 0, 30, 30)
 		pixelMap = 
 			for x in [0..imgData.width-1]
 				for y in [0..imgData.height-1]
@@ -74,7 +74,7 @@ redraw = () ->
 	ctx.clearRect 0, 0, ctx.canvas.width, ctx.canvas.height
 	ctx.strokeStyle = '#000000'
 	ctx.lineJoin = 'round'
-	ctx.lineWidth = 15
+	ctx.lineWidth = 12
 
 	_.forEach clicks, (v, k) ->
 		ctx.beginPath()
@@ -94,11 +94,11 @@ scaleImage = (canvas) ->
 	scaleCtx = scaleCanvas.getContext("2d");
 
 	#Set Size
-	scaleCanvas.width = 20
-	scaleCanvas.height = 20
+	scaleCanvas.width = 30
+	scaleCanvas.height = 30
 
 	#Scale Image
-	scaleCtx.scale(.1,.1);
+	scaleCtx.scale(.2,.2);
 	scaleCtx.drawImage(canvas,0,0)
 
 	clear canvas
@@ -120,6 +120,7 @@ convertToGrayscale = (pixel) ->
 	#(((0.2125*pixel.r) + (0.7154 * pixel.g) + (0.0721 * pixel.b))/255).toString()
 	
 sendPostData = (req, img) ->
+	###
 	xhttp = new XMLHttpRequest()
 	xhttp.open "POST", '/img', true
 	xhttp.setRequestHeader 'Content-Type', 'application/json'
@@ -135,10 +136,17 @@ sendPostData = (req, img) ->
 				parent.appendChild prediction
 				parent.appendChild img
 				container.appendChild parent
+	###
+	container = document.getElementById 'results'
+	parent = document.createElement('div')
+	parent.appendChild img
+	container.appendChild parent
 
 	xhttp.send JSON.stringify req
 
 sendTrainingData = (req) ->
+	#req.data = _.map [0..900], (v) -> v.toString()
+	#req.num = "Number"
 	xhttp = new XMLHttpRequest()
 	xhttp.open "POST", '/train', true
 	xhttp.setRequestHeader 'Content-Type', 'application/json'
