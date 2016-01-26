@@ -3,6 +3,13 @@ request = require 'request'
 bodyParser = require 'body-parser'
 csvWriter = require('csv-write-stream')
 fs = require('fs');
+nconf = require('nconf');
+nconf.argv()
+   .env()
+   .file({ file: './config.json' });
+
+console.log('apiKey: ' + nconf.get('apiKey'))
+console.log('wsUrl: ' + nconf.get('wsUrl'))
 
 app = express()
 app.engine 'html', require('ejs').renderFile
@@ -43,9 +50,3 @@ app.post '/img', (req,res) ->
 
 app.listen 3000, () ->
 	console.log 'Server Started'
-
-#wsUrl = 'https://ussouthcentral.services.azureml.net/workspaces/a85ddf947a0d405a88479716d397e9d6/services/715562c4fd3047198f6460ec5f6aae09/execute?api-version=2.0'
-#apiKey = 'mhsFax1F6uyU/9384crjqbBIjFiS80Qrhel8egogSWwV2DyTV1LsAvWtlRr/zCOM7+JQENrStml8o/k9+N+bCQ=='
-
-wsUrl = 'https://ussouthcentral.services.azureml.net/workspaces/a85ddf947a0d405a88479716d397e9d6/services/9df76eb337174d21adb5ccab17316307/execute?api-version=2.0'
-apiKey = 'AZvmTwtOs2XnF50EW7Z8YXe/zXb/dkflx8ACmqGAZGqDDvkFbJnEmt2JSGMk1AaG5/xvek8uOdl/7x3g0ZIoxA=='

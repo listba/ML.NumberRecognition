@@ -1,5 +1,5 @@
 (function() {
-  var apiKey, app, bodyParser, csvWriter, express, fs, request, writer, wsUrl;
+  var app, bodyParser, csvWriter, express, fs, nconf, request, writer;
 
   express = require('express');
 
@@ -10,6 +10,16 @@
   csvWriter = require('csv-write-stream');
 
   fs = require('fs');
+
+  nconf = require('nconf');
+
+  nconf.argv().env().file({
+    file: './config.json'
+  });
+
+  console.log('apiKey: ' + nconf.get('apiKey'));
+
+  console.log('wsUrl: ' + nconf.get('wsUrl'));
 
   app = express();
 
@@ -64,9 +74,5 @@
   app.listen(3000, function() {
     return console.log('Server Started');
   });
-
-  wsUrl = 'https://ussouthcentral.services.azureml.net/workspaces/a85ddf947a0d405a88479716d397e9d6/services/9df76eb337174d21adb5ccab17316307/execute?api-version=2.0';
-
-  apiKey = 'AZvmTwtOs2XnF50EW7Z8YXe/zXb/dkflx8ACmqGAZGqDDvkFbJnEmt2JSGMk1AaG5/xvek8uOdl/7x3g0ZIoxA==';
 
 }).call(this);
