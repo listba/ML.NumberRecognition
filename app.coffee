@@ -4,10 +4,9 @@ bodyParser = require 'body-parser'
 csvWriter = require('csv-write-stream')
 fs = require('fs');
 nconf = require('nconf');
-nconf.argv()
-   .env()
-   .file({ file: './config.json' });
 
+#Get Config Driven Data
+nconf.argv().env().file { file: './config.json' }
 apiKey = nconf.get 'apiKey'
 wsUrl = nconf.get 'wsUrl'
 
@@ -17,19 +16,21 @@ app.use express.static('public')
 app.use bodyParser.json()
 writer = csvWriter()
 
+# Fetch index page
 app.get '/', (req, res) ->
 	res.render 'index.html'
 
+# Gets Training Data form API Request and appends it to a csv file
 app.post '/train', (req,res) ->
 	console.log "Training Request Receieved for #{req.body.num}"
-	fs.appendFile('trainingData.csv', "#{req.body.data.join(',')},#{req.body.num}\n", encoding='utf8', (err) ->
+	fs.appendFile 'trainingData.csv', "#{req.body.data.join(',')},#{req.body.num}\n", encoding='utf8', (err) ->
 		if (err)
 			console.log "Error Writing to csv #{err}"
 			res.send err
 		else
 			res.send {response:"Success!"}
-	)
 
+# Predict Value from API Request
 app.post '/img', (req,res) ->
 	console.log 'Receieved Number Request'
 	wsRequest = request({
