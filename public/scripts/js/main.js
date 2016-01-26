@@ -77,7 +77,7 @@
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.strokeStyle = '#000000';
     ctx.lineJoin = 'round';
-    ctx.lineWidth = 9;
+    ctx.lineWidth = 15;
     _.forEach(clicks, function(v, k) {
       ctx.beginPath();
       if (v.drag && k) {

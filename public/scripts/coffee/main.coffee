@@ -60,7 +60,7 @@ redraw = () ->
 	ctx.clearRect 0, 0, ctx.canvas.width, ctx.canvas.height
 	ctx.strokeStyle = '#000000'
 	ctx.lineJoin = 'round'
-	ctx.lineWidth = 9
+	ctx.lineWidth = 15
 
 	_.forEach clicks, (v, k) ->
 		ctx.beginPath()
