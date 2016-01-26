@@ -1,5 +1,5 @@
 (function() {
-  var app, bodyParser, csvWriter, express, fs, nconf, request, writer;
+  var apiKey, app, bodyParser, csvWriter, express, fs, nconf, request, writer, wsUrl;
 
   express = require('express');
 
@@ -17,9 +17,9 @@
     file: './config.json'
   });
 
-  console.log('apiKey: ' + nconf.get('apiKey'));
+  apiKey = nconf.get('apiKey');
 
-  console.log('wsUrl: ' + nconf.get('wsUrl'));
+  wsUrl = nconf.get('wsUrl');
 
   app = express();
 

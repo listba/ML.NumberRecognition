@@ -8,8 +8,8 @@ nconf.argv()
    .env()
    .file({ file: './config.json' });
 
-console.log('apiKey: ' + nconf.get('apiKey'))
-console.log('wsUrl: ' + nconf.get('wsUrl'))
+apiKey = nconf.get 'apiKey'
+wsUrl = nconf.get 'wsUrl'
 
 app = express()
 app.engine 'html', require('ejs').renderFile
