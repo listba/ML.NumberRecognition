@@ -132,11 +132,11 @@ sendPostData = (req, img) ->
 				container = document.getElementById 'results'
 				parent = document.createElement('div')
 				prediction = document.createElement('label')
-				prediction.innerHTML = pd[3]
+				prediction.innerHTML = pd[pd.length]
 				parent.appendChild prediction
 				parent.appendChild img
 				container.appendChild parent
-	
+
 	xhttp.send JSON.stringify req
 	###
 	container = document.getElementById 'results'
