@@ -43,7 +43,7 @@
       pixelData = _.flatten(pixelMap);
       if (action === "11") {
         requestDataBase.Inputs.Number.Values = [pixelData];
-        return sendPostData(requestDataBase, scaleCanvas);
+        return sendPostData(requestDataBase, scaleCanvas, 0);
       } else {
         return sendTrainingData({
           data: pixelData,
@@ -144,7 +144,7 @@
     return pixel.a / 255;
   };
 
-  sendPostData = function(req, img) {
+  sendPostData = function(req, img, attempt) {
     var xhttp;
     xhttp = new XMLHttpRequest();
     xhttp.open("POST", '/img', true);
@@ -154,14 +154,19 @@
       if (xhttp.readyState === 4 && xhttp.status === 200) {
         data = JSON.parse(xhttp.responseText);
         if (data.statusCode === 200) {
-          pd = data.body.Results.Number.value.Values[0].slice(900);
+          pd = data.body.Results.Number.value.Values[0];
           container = document.getElementById('results');
           parent = document.createElement('div');
           prediction = document.createElement('label');
           prediction.innerHTML = pd[pd.length - 1];
           parent.appendChild(prediction);
           parent.appendChild(img);
-          return container.appendChild(parent);
+          container.appendChild(parent);
+          return console.log("Number predicted " + pd[pd.length - 1] + " attempt " + attempt);
+        } else if (attempt < 5) {
+          return sendPostData(req, img, attempt + 1);
+        } else {
+          return console.log("failed to predict after " + attempt + " attempts");
         }
       }
     };

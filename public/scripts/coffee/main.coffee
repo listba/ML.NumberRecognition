@@ -25,7 +25,7 @@ init = () ->
 		pixelData = _.flatten pixelMap
 		if action == "11"
 			requestDataBase.Inputs.Number.Values = [pixelData]
-			sendPostData requestDataBase, scaleCanvas
+			sendPostData requestDataBase, scaleCanvas, 0
 		else
 			sendTrainingData {data: pixelData, num: action}
 	)
@@ -119,7 +119,7 @@ convertToGrayscale = (pixel) ->
 	pixel.a/255
 	#(((0.2125*pixel.r) + (0.7154 * pixel.g) + (0.0721 * pixel.b))/255).toString()
 	
-sendPostData = (req, img) ->
+sendPostData = (req, img, attempt) ->
 	
 	xhttp = new XMLHttpRequest()
 	xhttp.open "POST", '/img', true
@@ -128,7 +128,7 @@ sendPostData = (req, img) ->
 		if xhttp.readyState == 4 && xhttp.status == 200
 			data = JSON.parse xhttp.responseText
 			if data.statusCode is 200
-				pd = data.body.Results.Number.value.Values[0].slice(900)
+				pd = data.body.Results.Number.value.Values[0]
 				container = document.getElementById 'results'
 				parent = document.createElement('div')
 				prediction = document.createElement('label')
@@ -136,6 +136,11 @@ sendPostData = (req, img) ->
 				parent.appendChild prediction
 				parent.appendChild img
 				container.appendChild parent
+				console.log "Number predicted #{pd[pd.length-1]} attempt #{attempt}"
+			else if attempt < 5
+				sendPostData req, img, attempt+1
+			else
+				console.log "failed to predict after #{attempt} attempts"
 
 	xhttp.send JSON.stringify req
 	###
