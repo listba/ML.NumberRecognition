@@ -4,27 +4,41 @@ unit = 1
 paint = false
 clicks = new Array()
 ctx = {}
-
+trainingCounts = [0..10].map -> 0
 # Public Functions
 init = () ->
 	canvas = document.getElementById 'NumberCanvas'
 	ctx = canvas.getContext('2d')
 	bindEvents canvas
 
-	scaleBtn = document.getElementById 'scale'
-	scaleBtn.addEventListener('click', (e) ->
+	submitBtn = document.getElementById 'submitNumber'
+	submitBtn.addEventListener('click', (e) ->
+		ddlAction = document.getElementById 'action'
+		action = ddlAction.options[ddlAction.selectedIndex].value
+
 		scaleCanvas = scaleImage(canvas,ctx);
 		imgData = scaleCanvas.getContext('2d').getImageData(0, 0, 20, 20)
 		pixelMap = 
 			for x in [0..imgData.width-1]
 				for y in [0..imgData.height-1]
 					convertToGrayscale(getPixel(imgData, x, y))
+		pixelData = _.flatten pixelMap
+		if action == "11"
+			requestDataBase.Inputs.Number.Values = [pixelData]
+			sendPostData requestDataBase, scaleCanvas
+		else
+			sendTrainingData {data: pixelData, num: action}
+	)
 
-		requestDataBase.Inputs.Number.Values = [_.flatten pixelMap]
-		sendPostData requestDataBase, scaleCanvas
-	);
+	clearBtn = document.getElementById 'clear'
+	clearBtn.addEventListener 'click', (e) ->
+		clear canvas
 
-# Private Functions
+clear = (canvas) ->
+	#clear drawing area
+	ctx.clearRect(0, 0, canvas.width, canvas.height)
+	clicks = new Array()
+
 bindEvents = (canvas) ->
 	canvas.addEventListener('mousedown', (e) ->
 		paint = true
@@ -87,9 +101,7 @@ scaleImage = (canvas) ->
 	scaleCtx.scale(.1,.1);
 	scaleCtx.drawImage(canvas,0,0)
 
-	#clear drawing area
-	ctx.clearRect(0, 0, canvas.width, canvas.height)
-	clicks = new Array()
+	clear canvas
 	#return scaled down image
 	scaleCanvas
 
@@ -126,5 +138,25 @@ sendPostData = (req, img) ->
 
 	xhttp.send JSON.stringify req
 
+sendTrainingData = (req) ->
+	xhttp = new XMLHttpRequest()
+	xhttp.open "POST", '/train', true
+	xhttp.setRequestHeader 'Content-Type', 'application/json'
+	xhttp.onreadystatechange = () ->
+		if xhttp.readyState == 4 && xhttp.status == 200
+			data = JSON.parse xhttp.responseText
+			console.log "#{data.response} for #{req.num}"
+			trainingCounts[req.num] += 1
+			container = document.getElementById 'trainingResults'
+			container.innerHTML = ''
+			ul = document.createElement('ul')
+			_.forEach trainingCounts, (v, k) ->
+				li = document.createElement('li')
+				k = 0 if k is 10
+				li.innerHTML = "#{k}:#{v}"
+				ul.appendChild li
+			container.appendChild ul
+
+	xhttp.send JSON.stringify req
 
 window.addEventListener('load', init, false)

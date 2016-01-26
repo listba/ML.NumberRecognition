@@ -1,11 +1,15 @@
 (function() {
-  var apiKey, app, bodyParser, express, request, wsUrl;
+  var apiKey, app, bodyParser, csvWriter, express, fs, request, writer, wsUrl;
 
   express = require('express');
 
   request = require('request');
 
   bodyParser = require('body-parser');
+
+  csvWriter = require('csv-write-stream');
+
+  fs = require('fs');
 
   app = express();
 
@@ -15,13 +19,30 @@
 
   app.use(bodyParser.json());
 
+  writer = csvWriter();
+
   app.get('/', function(req, res) {
     return res.render('index.html');
   });
 
+  app.post('/train', function(req, res) {
+    var encoding;
+    console.log("Training Request Receieved for " + req.body.num);
+    return fs.appendFile('trainingData.csv', (req.body.data.join(',')) + "," + req.body.num + "\n", encoding = 'utf8', function(err) {
+      if (err) {
+        console.log("Error Writing to csv " + err);
+        return res.send(err);
+      } else {
+        return res.send({
+          response: "Success!"
+        });
+      }
+    });
+  });
+
   app.post('/img', function(req, res) {
     var wsRequest;
-    console.log("Receieved Number Request");
+    console.log('Receieved Number Request');
     return wsRequest = request({
       url: wsUrl,
       method: 'POST',

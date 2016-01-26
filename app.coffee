@@ -1,16 +1,30 @@
 express = require 'express'
 request = require 'request'
 bodyParser = require 'body-parser'
+csvWriter = require('csv-write-stream')
+fs = require('fs');
+
 app = express()
 app.engine 'html', require('ejs').renderFile
 app.use express.static('public')
 app.use bodyParser.json()
+writer = csvWriter()
 
 app.get '/', (req, res) ->
 	res.render 'index.html'
 
+app.post '/train', (req,res) ->
+	console.log "Training Request Receieved for #{req.body.num}"
+	fs.appendFile('trainingData.csv', "#{req.body.data.join(',')},#{req.body.num}\n", encoding='utf8', (err) ->
+		if (err)
+			console.log "Error Writing to csv #{err}"
+			res.send err
+		else
+			res.send {response:"Success!"}
+	)
+
 app.post '/img', (req,res) ->
-	console.log "Receieved Number Request"
+	console.log 'Receieved Number Request'
 	wsRequest = request({
 		url: wsUrl,
 		method: 'POST',

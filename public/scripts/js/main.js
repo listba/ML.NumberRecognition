@@ -1,5 +1,5 @@
 (function() {
-  var addClick, bindEvents, clicks, convertToGrayscale, ctx, getPixel, init, paint, redraw, scaleImage, sendPostData, unit;
+  var addClick, bindEvents, clear, clicks, convertToGrayscale, ctx, getPixel, init, paint, redraw, scaleImage, sendPostData, sendTrainingData, trainingCounts, unit;
 
   unit = 1;
 
@@ -9,14 +9,20 @@
 
   ctx = {};
 
+  trainingCounts = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function() {
+    return 0;
+  });
+
   init = function() {
-    var canvas, scaleBtn;
+    var canvas, clearBtn, submitBtn;
     canvas = document.getElementById('NumberCanvas');
     ctx = canvas.getContext('2d');
     bindEvents(canvas);
-    scaleBtn = document.getElementById('scale');
-    return scaleBtn.addEventListener('click', function(e) {
-      var imgData, pixelMap, scaleCanvas, x, y;
+    submitBtn = document.getElementById('submitNumber');
+    submitBtn.addEventListener('click', function(e) {
+      var action, ddlAction, imgData, pixelData, pixelMap, scaleCanvas, x, y;
+      ddlAction = document.getElementById('action');
+      action = ddlAction.options[ddlAction.selectedIndex].value;
       scaleCanvas = scaleImage(canvas, ctx);
       imgData = scaleCanvas.getContext('2d').getImageData(0, 0, 20, 20);
       pixelMap = (function() {
@@ -34,9 +40,26 @@
         }
         return results;
       })();
-      requestDataBase.Inputs.Number.Values = [_.flatten(pixelMap)];
-      return sendPostData(requestDataBase, scaleCanvas);
+      pixelData = _.flatten(pixelMap);
+      if (action === "11") {
+        requestDataBase.Inputs.Number.Values = [pixelData];
+        return sendPostData(requestDataBase, scaleCanvas);
+      } else {
+        return sendTrainingData({
+          data: pixelData,
+          num: action
+        });
+      }
     });
+    clearBtn = document.getElementById('clear');
+    return clearBtn.addEventListener('click', function(e) {
+      return clear(canvas);
+    });
+  };
+
+  clear = function(canvas) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    return clicks = new Array();
   };
 
   bindEvents = function(canvas) {
@@ -100,8 +123,7 @@
     scaleCanvas.height = 20;
     scaleCtx.scale(.1, .1);
     scaleCtx.drawImage(canvas, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    clicks = new Array();
+    clear(canvas);
     return scaleCanvas;
   };
 
@@ -141,6 +163,35 @@
           parent.appendChild(img);
           return container.appendChild(parent);
         }
+      }
+    };
+    return xhttp.send(JSON.stringify(req));
+  };
+
+  sendTrainingData = function(req) {
+    var xhttp;
+    xhttp = new XMLHttpRequest();
+    xhttp.open("POST", '/train', true);
+    xhttp.setRequestHeader('Content-Type', 'application/json');
+    xhttp.onreadystatechange = function() {
+      var container, data, ul;
+      if (xhttp.readyState === 4 && xhttp.status === 200) {
+        data = JSON.parse(xhttp.responseText);
+        console.log(data.response + " for " + req.num);
+        trainingCounts[req.num] += 1;
+        container = document.getElementById('trainingResults');
+        container.innerHTML = '';
+        ul = document.createElement('ul');
+        _.forEach(trainingCounts, function(v, k) {
+          var li;
+          li = document.createElement('li');
+          if (k === 10) {
+            k = 0;
+          }
+          li.innerHTML = k + ":" + v;
+          return ul.appendChild(li);
+        });
+        return container.appendChild(ul);
       }
     };
     return xhttp.send(JSON.stringify(req));
