@@ -43,7 +43,7 @@
       pixelData = _.flatten(pixelMap);
       if (action === "11") {
         requestDataBase.Inputs.Number.Values = [pixelData];
-        return sendPostData(requestDataBase, scaleCanvas, 0);
+        return sendPostData(requestDataBase, scaleCanvas);
       } else {
         return sendTrainingData({
           data: pixelData,
@@ -65,13 +65,13 @@
   bindEvents = function(canvas) {
     canvas.addEventListener('mousedown', function(e) {
       paint = true;
-      addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, false);
+      addClick(e.offsetX, e.offsetY, false);
       redraw();
       return unit;
     });
     canvas.addEventListener('mousemove', function(e) {
       if (paint) {
-        addClick(e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true);
+        addClick(e.offsetX, e.offsetY, true);
         redraw();
       }
       return unit;
@@ -144,40 +144,43 @@
     return pixel.a / 255;
   };
 
-  sendPostData = function(req, img, attempt) {
+  sendPostData = function(req, img) {
     var xhttp;
     xhttp = new XMLHttpRequest();
     xhttp.open("POST", '/img', true);
     xhttp.setRequestHeader('Content-Type', 'application/json');
     xhttp.onreadystatechange = function() {
-      var container, data, parent, pd, prediction;
+      var cell, data, pd, row, table, val;
       if (xhttp.readyState === 4 && xhttp.status === 200) {
         data = JSON.parse(xhttp.responseText);
+        table = document.getElementById('results');
+        row = document.createElement('tr');
+        cell = document.createElement('td');
+        cell.appendChild(img);
+        row.appendChild(cell);
         if (data.statusCode === 200) {
           pd = data.body.Results.Number.value.Values[0];
-          container = document.getElementById('results');
-          parent = document.createElement('div');
-          prediction = document.createElement('label');
-          prediction.innerHTML = pd[pd.length - 1];
-          parent.appendChild(prediction);
-          parent.appendChild(img);
-          container.appendChild(parent);
-          return console.log("Number predicted " + pd[pd.length - 1] + " attempt " + attempt);
-        } else if (attempt < 5) {
-          return sendPostData(req, img, attempt + 1);
+          cell = document.createElement('td');
+          val = pd[pd.length - 1];
+          cell.innerHTML = val === 10 ? 0 : val;
+          row.appendChild(cell);
+          cell = document.createElement('td');
+          cell.innerHTML = pd[val - 1];
+          row.appendChild(cell);
         } else {
-          return console.log("failed to predict after " + attempt + " attempts");
+          console.log('failed to predict');
+          cell = document.createElement('td');
+          cell.innerHTML = 'failed to predict';
+          row.appendChild(cell);
+        }
+        if (table.childNodes.length === 0) {
+          return table.appendChild(row);
+        } else {
+          return table.insertBefore(row, table.childNodes[0]);
         }
       }
     };
     return xhttp.send(JSON.stringify(req));
-
-    /*
-    	container = document.getElementById 'results'
-    	parent = document.createElement('div')
-    	parent.appendChild img
-    	container.appendChild parent
-     */
   };
 
   sendTrainingData = function(req) {

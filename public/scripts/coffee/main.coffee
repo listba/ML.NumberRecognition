@@ -25,7 +25,7 @@ init = () ->
 		pixelData = _.flatten pixelMap
 		if action == "11"
 			requestDataBase.Inputs.Number.Values = [pixelData]
-			sendPostData requestDataBase, scaleCanvas, 0
+			sendPostData requestDataBase, scaleCanvas
 		else
 			sendTrainingData {data: pixelData, num: action}
 	)
@@ -42,13 +42,14 @@ clear = (canvas) ->
 bindEvents = (canvas) ->
 	canvas.addEventListener('mousedown', (e) ->
 		paint = true
-		addClick e.pageX - this.offsetLeft, e.pageY - this.offsetTop, false
+		addClick e.offsetX, e.offsetY, false
 		redraw()
 		unit
 	)
 	canvas.addEventListener('mousemove', (e) ->
 		if paint
-			addClick e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true
+			addClick e.offsetX, e.offsetY, true
+			#addClick e.pageX - this.offsetLeft, e.pageY - this.offsetTop, true
 			redraw()
 		unit
 	)
@@ -119,7 +120,7 @@ convertToGrayscale = (pixel) ->
 	pixel.a/255
 	#(((0.2125*pixel.r) + (0.7154 * pixel.g) + (0.0721 * pixel.b))/255).toString()
 	
-sendPostData = (req, img, attempt) ->
+sendPostData = (req, img) ->
 	
 	xhttp = new XMLHttpRequest()
 	xhttp.open "POST", '/img', true
@@ -127,28 +128,33 @@ sendPostData = (req, img, attempt) ->
 	xhttp.onreadystatechange = () ->
 		if xhttp.readyState == 4 && xhttp.status == 200
 			data = JSON.parse xhttp.responseText
+			table = document.getElementById 'results'
+			row = document.createElement('tr')
+			cell = document.createElement('td')
+			cell.appendChild img
+			row.appendChild cell
 			if data.statusCode is 200
 				pd = data.body.Results.Number.value.Values[0]
-				container = document.getElementById 'results'
-				parent = document.createElement('div')
-				prediction = document.createElement('label')
-				prediction.innerHTML = pd[pd.length-1]
-				parent.appendChild prediction
-				parent.appendChild img
-				container.appendChild parent
-				console.log "Number predicted #{pd[pd.length-1]} attempt #{attempt}"
-			else if attempt < 5
-				sendPostData req, img, attempt+1
+
+				cell = document.createElement('td')
+				val = pd[pd.length-1]
+				cell.innerHTML = if val is 10 then 0 else val
+				row.appendChild cell
+
+				cell = document.createElement('td')
+				cell.innerHTML = pd[val-1]
+				row.appendChild cell
 			else
-				console.log "failed to predict after #{attempt} attempts"
+				console.log 'failed to predict'
+				cell = document.createElement('td')
+				cell.innerHTML = 'failed to predict'
+				row.appendChild cell
+			if table.childNodes.length == 0
+				table.appendChild row
+			else
+				table.insertBefore row, table.childNodes[0]
 
 	xhttp.send JSON.stringify req
-	###
-	container = document.getElementById 'results'
-	parent = document.createElement('div')
-	parent.appendChild img
-	container.appendChild parent
-	###
 	
 
 sendTrainingData = (req) ->

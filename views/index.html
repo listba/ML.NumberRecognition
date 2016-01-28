@@ -1,37 +1,76 @@
 <!DOCTYPE HTML>
 <html>
-<head>
-	<title>ML Handwriting</title>
+<head lang="en">
+   <meta charset="utf-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	
 	<link rel="stylesheet" type="text/css" href="../content/css/main.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.0.0/lodash.min.js"></script>
+	<script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 	<script src="../scripts/js/requestDataBase.js"></script>
 	<script src="../scripts/js/sampleWSData.js"></script>
 	<script src="../scripts/js/main.js"></script>
+   <title>ML Handwriting</title>
 <head>
 <body>
-<header>
-   <h1>Handwriting Recogniton</h1>
+<header class="navbar navbar-inverse navbar-fixed-top">
+   <div class="container">
+      <nav class="navbar-header h2">
+         Azure ML Number Prediction
+      </nav>
+   </div>
 </header>
-<section>
-   <h2>Predict Number Or Train Data<h2>
-   <canvas id="NumberCanvas" height="150" width="150"></canvas>
-   <select id="action">
-      <option value="1">Train 1</option>
-      <option value="2">Train 2</option>
-      <option value="3">Train 3</option>
-      <option value="4">Train 4</option>
-      <option value="5">Train 5</option>
-      <option value="6">Train 6</option>
-      <option value="7">Train 7</option>
-      <option value="8">Train 8</option>
-      <option value="9">Train 9</option>
-      <option value="10">Train 0</option>
-      <option value="11" selected>Predict</option>
-   </select>
-   <button id="submitNumber">Submit</button>
-   <button id="clear">Clear</button>
+<section class="container">
+   <section class="row">
+      <section class="col-md-5">
+         <h2>Predict Number Or Train Data</h2>
+         <section class="row">
+            <section class="col-md-5">
+               <canvas id="NumberCanvas" height="150" width="150"></canvas>
+            </section>
+            <section class="col-md-7">
+               <fieldset class="form-group">
+                  <label for="action">Action</label>
+                  <select id="action" class="form-control">
+                     <option value="1">Train 1</option>
+                     <option value="2">Train 2</option>
+                     <option value="3">Train 3</option>
+                     <option value="4">Train 4</option>
+                     <option value="5">Train 5</option>
+                     <option value="6">Train 6</option>
+                     <option value="7">Train 7</option>
+                     <option value="8">Train 8</option>
+                     <option value="9">Train 9</option>
+                     <option value="10">Train 0</option>
+                     <option value="11" selected>Predict</option>
+                  </select>
+               </fieldset>
+               <nav class="float-right">
+                  <button id="submitNumber" class="btn btn-primary">Submit</button>
+                  <button id="clear" class="btn btn-default">Clear</button>
+               </nav>
+         </section>
+         </section>
+      </section>
+      <section class="col-md-7">
+         <table class="table">
+            <thead>
+               <tr>
+                  <th>Number</th>
+                  <th>Result</th>
+                  <th>Accuracy</th>
+               </tr>
+            </thead>
+            <tbody id="results"></tbody>
+         </table>
+      </section>
+   </section>
+   <section class="row">
+      <section id="trainingResults" class="col-md-12"></section>
+   </section>
 </section>
-<section id="results"></div>
-<section id="trainingResults"></div>
 </body>
 </html>
