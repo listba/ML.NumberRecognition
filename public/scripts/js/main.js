@@ -165,13 +165,17 @@
           cell.innerHTML = val === 10 ? 0 : val;
           row.appendChild(cell);
           cell = document.createElement('td');
-          cell.innerHTML = pd[val - 1];
+          cell.innerHTML = (Math.trunc(pd[val - 1] * 10000) / 100) + "%";
           row.appendChild(cell);
         } else {
           console.log('failed to predict');
           cell = document.createElement('td');
           cell.innerHTML = 'failed to predict';
           row.appendChild(cell);
+          cell = document.createElement('td');
+          cell.innerHTML = 'N/A';
+          row.appendChild(cell);
+          row.className = "danger";
         }
         if (table.childNodes.length === 0) {
           return table.appendChild(row);
