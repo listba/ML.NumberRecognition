@@ -1,7 +1,7 @@
 express = require 'express'
 request = require 'request'
 bodyParser = require 'body-parser'
-csvWriter = require('csv-write-stream')
+ejs = require('ejs')
 fs = require('fs');
 nconf = require('nconf');
 
@@ -11,10 +11,9 @@ apiKey = nconf.get 'apiKey'
 wsUrl = nconf.get 'wsUrl'
 
 app = express()
-app.engine 'html', require('ejs').renderFile
+app.engine 'html', ejs.renderFile
 app.use express.static('public')
 app.use bodyParser.json()
-writer = csvWriter()
 
 # Fetch index page
 app.get '/', (req, res) ->
