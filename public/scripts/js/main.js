@@ -1,5 +1,5 @@
 (function() {
-  var addClick, bindEvents, clear, clicks, convertToGrayscale, ctx, getPixel, init, paint, redraw, scaleImage, sendPostData, sendTrainingData, trainingCounts, unit;
+  var RequestData, addClick, bindEvents, clear, clicks, convertToGrayscale, ctx, getPixel, init, paint, redraw, scaleImage, sendPostData, sendTrainingData, trainingCounts, unit;
 
   unit = 1;
 
@@ -42,8 +42,7 @@
       })();
       pixelData = _.flatten(pixelMap);
       if (action === "11") {
-        requestDataBase.Inputs.Number.Values = [pixelData];
-        return sendPostData(requestDataBase, scaleCanvas);
+        return sendPostData(new RequestData([pixelData]), scaleCanvas);
       } else {
         return sendTrainingData({
           data: pixelData,
@@ -214,6 +213,16 @@
       }
     };
     return xhttp.send(JSON.stringify(req));
+  };
+
+  RequestData = function(values) {
+    this.Inputs = {
+      Number: {
+        Values: values
+      }
+    };
+    this.GlobalParameters = {};
+    return unit;
   };
 
   window.addEventListener('load', init, false);

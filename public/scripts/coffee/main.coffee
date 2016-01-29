@@ -24,8 +24,7 @@ init = () ->
 					convertToGrayscale(getPixel(imgData, x, y))
 		pixelData = _.flatten pixelMap
 		if action == "11"
-			requestDataBase.Inputs.Number.Values = [pixelData]
-			sendPostData requestDataBase, scaleCanvas
+			sendPostData new RequestData([pixelData]), scaleCanvas
 		else
 			sendTrainingData {data: pixelData, num: action}
 	)
@@ -186,5 +185,12 @@ sendTrainingData = (req) ->
 			container.appendChild ul
 
 	xhttp.send JSON.stringify req
+
+RequestData = (values) ->
+	this.Inputs =
+		Number:
+			Values: values
+	this.GlobalParameters = {}
+	unit
 
 window.addEventListener('load', init, false)
