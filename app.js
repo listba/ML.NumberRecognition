@@ -1,5 +1,5 @@
 (function() {
-  var apiKey, app, bodyParser, csvWriter, express, fs, nconf, request, writer, wsUrl;
+  var apiKey, app, bodyParser, ejs, express, fs, nconf, request, wsUrl;
 
   express = require('express');
 
@@ -7,7 +7,7 @@
 
   bodyParser = require('body-parser');
 
-  csvWriter = require('csv-write-stream');
+  ejs = require('ejs');
 
   fs = require('fs');
 
@@ -23,13 +23,11 @@
 
   app = express();
 
-  app.engine('html', require('ejs').renderFile);
+  app.engine('html', ejs.renderFile);
 
   app.use(express["static"]('public'));
 
   app.use(bodyParser.json());
-
-  writer = csvWriter();
 
   app.get('/', function(req, res) {
     return res.render('index.html');
