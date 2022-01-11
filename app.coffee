@@ -33,7 +33,7 @@ app.post '/train', (req,res) ->
 app.post '/img', (req,res) ->
 	console.log 'Receieved Number Request'
 	wsRequest = request({
-		url: wsUrl,
+		uri: wsUrl,
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',

@@ -4,22 +4,25 @@
   "description": "machine learning handwriting",
   "main": "gruntfile.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "grunt coffee less",
+    "watch": "grunt watch",
+    "start": "node app.js"
   },
   "author": "Ben List",
   "license": "ISC",
   "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-coffee": "^0.13.0",
-    "grunt-contrib-less": "^1.1.0",
-    "grunt-contrib-watch": "^0.6.1"
+    "grunt": "^1.4.1",
+    "grunt-cli": "^1.4.3",
+    "grunt-contrib-coffee": "^2.1.0",
+    "grunt-contrib-less": "^3.0.0",
+    "grunt-contrib-watch": "^1.1.0"
   },
   "dependencies": {
-    "body-parser": "^1.14.2",
-    "ejs": "^2.4.1",
-    "express": "^4.13.4",
+    "body-parser": "^1.19.1",
+    "ejs": "^3.1.6",
+    "express": "^4.17.2",
     "fs": "0.0.2",
-    "nconf": "^0.8.2",
+    "nconf": "^0.11.3",
     "request": "^2.69.0"
   }
 }
