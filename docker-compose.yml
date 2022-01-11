@@ -1,0 +1,21 @@
+version: "3.7"
+
+networks:
+  tf_proxy:
+    external: true
+
+services:
+  ml-app:
+    image: listba/ml:latest
+    networks:
+      - tf_proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.web-serv.entrypoints=http"
+      - "traefik.http.routers.web-serv.rule=Host(`ml.benlist.net`,`ml.benlist.dev`)"
+      - "traefik.http.routers.web-serv.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.web-serv-secure.entrypoints=https"
+      - "traefik.http.routers.web-serv-secure.rule=Host(`ml.benlist.net`,`ml.benlist.dev`)"
+      - "traefik.http.routers.web-serv-secure.tls=true"
+      - "traefik.http.routers.web-serv-secure.tls.certresolver=http"
+      - "traefik.docker.network=tf_proxy"
