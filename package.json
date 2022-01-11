@@ -4,9 +4,11 @@
   "description": "machine learning handwriting",
   "main": "gruntfile.js",
   "scripts": {
-    "build": "grunt coffee less",
-    "watch": "grunt watch",
-    "start": "node app.js"
+    "build"  : "grunt coffee less",
+    "watch"  : "grunt watch",
+    "start"  : "node ./src/app.js",
+    "docker" : "docker build -t listba/ml:latest .",
+    "docker-run" : "docker run --rm -it -p 3000:3000 listba/ml:latest"
   },
   "author": "Ben List",
   "license": "ISC",

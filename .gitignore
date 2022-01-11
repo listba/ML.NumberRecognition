@@ -36,6 +36,6 @@ node_modules
 config.json
 
 # generated files
-app.js
-public/scripts/js
-public/content/css
+src/app.js
+src/public/scripts/js
+src/public/content/css
