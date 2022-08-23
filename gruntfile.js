@@ -19,7 +19,7 @@ module.exports = function(grunt) {
         files: {
           //'./scripts/coffee/to/result.js': 'path/to/source.coffee', // 1:1 compile 
           './src/public/scripts/js/main.js': ['./src/public/scripts/coffee/*.coffee'], 
-          '../src/app.js': ['./src/app.coffee']
+          './src/app.js': ['./src/app.coffee']
         }
   }
     },

@@ -9,13 +9,16 @@ services:
     image: listba/ml:latest
     networks:
       - tf_proxy
+    volumes:
+      - ./data:/data
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.web-serv.entrypoints=http"
-      - "traefik.http.routers.web-serv.rule=Host(`ml.benlist.net`,`ml.benlist.dev`)"
-      - "traefik.http.routers.web-serv.middlewares=traefik-https-redirect"
-      - "traefik.http.routers.web-serv-secure.entrypoints=https"
-      - "traefik.http.routers.web-serv-secure.rule=Host(`ml.benlist.net`,`ml.benlist.dev`)"
-      - "traefik.http.routers.web-serv-secure.tls=true"
-      - "traefik.http.routers.web-serv-secure.tls.certresolver=http"
       - "traefik.docker.network=tf_proxy"
+      - "traefik.http.routers.ml-app.entrypoints=http"
+      - "traefik.http.routers.ml-app.rule=Host(`ml.benlist.net`,`ml.benlist.dev`)"
+      - "traefik.http.routers.ml-app.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.ml-app-secure.entrypoints=https"
+      - "traefik.http.routers.ml-app-secure.rule=Host(`ml.benlist.net`,`ml.benlist.dev`)"
+      - "traefik.http.routers.ml-app-secure.tls=true"
+      - "traefik.http.routers.ml-app-secure.tls.certresolver=http"
+      - "traefik.http.services.ml-app.loadbalancer.server.port=3000"
