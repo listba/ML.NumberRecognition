@@ -12,11 +12,12 @@ wsUrl = nconf.get 'wsUrl'
 
 app = express()
 app.engine 'html', ejs.renderFile
-app.use express.static('public')
+app.use express.static('./src/public')
 app.use bodyParser.json()
-
+app.set('views', './src/views/')
 # Fetch index page
 app.get '/', (req, res) ->
+	console.log "here"
 	res.render 'index.html'
 
 # Gets Training Data form API Request and appends it to a csv file
