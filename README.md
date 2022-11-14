@@ -13,3 +13,5 @@ npm install
 npm run build
 npm run start
 ```
+
+or run `./build.sh` to build a docker image `listba/ml:latest`
